@@ -2,3 +2,10 @@ env/
 .env
 /__pycache__
 /migrations
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
