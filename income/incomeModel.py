@@ -1,4 +1,6 @@
 from .. import db
+from ..category.categoryModel import CategorySchema
+from marshmallow import fields, Schema
 
 
 class Income(db.Model):
@@ -10,3 +12,13 @@ class Income(db.Model):
     date = db.Column(db.Date)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     category = db.relationship('Category', backref='incomes')
+
+
+class IncomeSchema(Schema):
+    id = fields.Int(data_key='id')
+    value = fields.Decimal(data_key='value')
+    description = fields.Str(data_key='description')
+    user_id = fields.Int(data_key='user_id')
+    date = fields.Date(data_key='date')
+    category_id = fields.Int(data_key='category_id')
+    category = fields.Nested(CategorySchema(only=("name",)), data_key='category')

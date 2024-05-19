@@ -1,4 +1,3 @@
 class Response:
-    @staticmethod
-    def make(status=True, msg='', data=[]):
-        return {'status': status, 'msg': msg, 'data': data}
+    # Função lambda que retorna um dicionário
+    make = lambda status=True, msg='', data=[]: {'status': status, 'msg': msg, 'data': data}
