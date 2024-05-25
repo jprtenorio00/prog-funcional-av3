@@ -12,30 +12,44 @@ class CategoryController:
     def get_data(self):
         try:
             data = self.dataHandler.grab_data(self.user_id)
-            return Response.make(status=True, data=data)
-        except:
-            return Response.make('Eror while trying to retrieve data')
+            modified_data = map(lambda x: {**x, 'name': 'Category: ' + x['name']}, data)
+            return Response.make(status=True, data=list(modified_data))
+        except Exception as e:
+            return Response.make(False, f"Error while trying to retrieve data: {str(e)}")
 
     def insert_new_data(self):
         try:
-            self.dataHandler.insert_new_data({
-                'id': request.json.get('id'),
+            preprocess_data = lambda data: [{k: v.strip() if isinstance(v, str) else v for k, v in item.items()} for item in [data]]
+            processed_data = preprocess_data({
+                'id': request.json.get('id', None), 
                 'name': request.json.get('name'),
                 'user_id': self.user_id,
             })
+
+            # Verifica se os dados processados têm 'name' válido antes de inserir
+            if not processed_data[0]['name']:  # Só verifica 'name' porque 'id' pode ser None
+                return Response.make(False, 'Invalid data provided')
+
+            self.dataHandler.insert_new_data(processed_data[0])
             return Response.make(True, 'Data successfully added')
-        except:
-            return Response.make(False, 'Insert data failed')
+        except Exception as e:
+            return Response.make(False, f"Insert data failed: {str(e)}")
 
     def update_data(self):
         try:
+            get_data = lambda x: lambda y: (x, y)
+            request_data = get_data(request.json.get('id'))(request.json.get('name'))
+
+            if not request_data[0] or not request_data[1]:
+                return Response.make(False, 'Invalid data provided')
+
             self.dataHandler.update_data({
-                'id': request.json.get('id'),
-                'name': request.json.get('name'),
+                'id': request_data[0],
+                'name': request_data[1],
             }, self.user_id)
             return Response.make(True, 'Data successfully updated')
-        except:
-            return Response.make(False, 'Update data failed')
+        except Exception as e:
+            return Response.make(False, f"Update data failed: {str(e)}")
 
     def delete_data(self):
         try:

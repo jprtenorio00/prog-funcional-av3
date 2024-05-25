@@ -44,17 +44,21 @@ class ExpenseController:
             return Response.make(False, 'Update data failed')
 
     def delete_data(self):
+        if not request.json.get('id'):
+            return Response.make(False, 'Id is required')
         try:
-            if not request.json.get('id'):
-                return Response.make(False, 'Id is required')
-            if not self.dataHandler.grab_one(request.json, self.user_id):
+            attempt_delete = lambda attempts, parameter, user_id: (
+                self.dataHandler.delete_data(parameter, user_id)
+                if attempts <= 1
+                else attempt_delete(attempts - 1, parameter, user_id)
+            )
+            object_to_delete = self.dataHandler.grab_one({'id': request.json.get('id')}, self.user_id)
+            if not object_to_delete:
                 return Response.make(False, 'Data not found')
-            self.dataHandler.delete_data({
-                'id': request.json.get('id'),
-            })
+            attempt_delete(3, {'id': request.json.get('id')}, self.user_id)
             return Response.make(True, 'Data successfully removed')
-        except:
-            return Response.make('Data failed to removed')
+        except Exception as e:
+            return Response.make(False, f"Error during data removal: {str(e)}")
 
     def search_single_data(self, expense_id):
         try:
