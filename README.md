@@ -14,9 +14,27 @@ Este projeto consiste em uma API desenvolvida em Python utilizando Flask, SQLAlc
 - **Python**: Linguagem de programação principal.
 - **MySQL**: Sistema de gerenciamento de banco de dados.
 
-## Requisitos
+## Requisitos e Observações
 
 Para executar este projeto, você precisará ter Python e MySQL instalados em sua máquina.
+Também será necessário cadastrar as roles de usuários.
+Antes dos comandos abaixo crie no diretório raiz o arquivo '.env'
+Execute primeiro: python -m venv env
+Em seguida: pip install -r requirements.txt
+Em seguida: Flask db migrate
+Em seguida: Flask db upgrade
+Roda esses comandos no banco: 
+INSERT INTO role (id,name) VALUES (1,'admin');
+INSERT INTO role (id,name) VALUES (2,'default');
+Execute um POST nesse endpoint: http://127.0.0.1:5000/register
+Com o body abaixo:
+{
+    "username": "admin",
+    "password": "123"
+}
+Em seguida no Banco de dados execute: SELECT * FROM USER; 
+Com isso altere o role_id do admin para 1.
+Para usar os outros endpoints precisa-se estar logado inicialmente.
 
 ## Configuração Inicial
 
